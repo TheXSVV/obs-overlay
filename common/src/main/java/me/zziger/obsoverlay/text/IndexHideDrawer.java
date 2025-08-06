@@ -20,6 +20,7 @@ public class IndexHideDrawer implements CharacterVisitor {
 
     private final TextRenderer textRenderer;
     private final int hideIndex;
+    private final int rankValueStart;
 
     final VertexConsumerProvider vertexConsumers;
     private final boolean shadow;
@@ -44,9 +45,10 @@ public class IndexHideDrawer implements CharacterVisitor {
         this.rectangles.add(rectangle);
     }
 
-    public IndexHideDrawer(final TextRenderer textRenderer, final int hideIndex, final VertexConsumerProvider vertexConsumers, final float x, final float y, final int color, final boolean shadow, final Matrix4f matrix, final TextRenderer.TextLayerType layerType, final int light) {
+    public IndexHideDrawer(final TextRenderer textRenderer, final int hideIndex, final int rankValueStart, final VertexConsumerProvider vertexConsumers, final float x, final float y, final int color, final boolean shadow, final Matrix4f matrix, final TextRenderer.TextLayerType layerType, final int light) {
         this.textRenderer = textRenderer;
         this.hideIndex = hideIndex;
+        this.rankValueStart = rankValueStart;
         this.vertexConsumers = vertexConsumers;
         this.x = x;
         this.y = y;
@@ -63,20 +65,38 @@ public class IndexHideDrawer implements CharacterVisitor {
 
     private int index = 0;
     private int replacementIndex = 0;
+    private int rankReplacementIndex = 0;
+    private boolean inRankReplacement = false;
 
     private static final String REPLACEMENT_STRING = "Ксолвик";
+    private static final String RANK_REPLACEMENT = "Staff";
 
     public boolean accept(int i, Style style, int charInt) {
         TextRendererInterface rendererInterface = (TextRendererInterface) textRenderer;
 
         if (MinecraftClient.getInstance().player != null) {
             String playerName = MinecraftClient.getInstance().player.getName().getString();
+
             if (hideIndex != -1 && index >= hideIndex && index < hideIndex + playerName.length()) {
                 if (replacementIndex < REPLACEMENT_STRING.length()) {
                     charInt = REPLACEMENT_STRING.charAt(replacementIndex);
                     replacementIndex++;
                 } else {
-                    this.x += 0;
+                    index++;
+                    return true;
+                }
+            }
+
+            if (rankValueStart != -1 && index >= rankValueStart && !Character.isWhitespace(charInt)) {
+                if (!inRankReplacement) {
+                    inRankReplacement = true;
+                    rankReplacementIndex = 0;
+                }
+
+                if (rankReplacementIndex < RANK_REPLACEMENT.length()) {
+                    charInt = RANK_REPLACEMENT.charAt(rankReplacementIndex);
+                    rankReplacementIndex++;
+                } else {
                     index++;
                     return true;
                 }

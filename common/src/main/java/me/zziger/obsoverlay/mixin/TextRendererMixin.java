@@ -40,17 +40,27 @@ public class TextRendererMixin implements TextRendererInterface {
     ) {
         TextRenderer self = (TextRenderer) (Object) this;
 
+        StringBuilder stringBuilder = new StringBuilder();
+        text.accept((i, style, charInt) -> {
+            stringBuilder.append((char) charInt);
+            return true;
+        });
+
+        String fullText = stringBuilder.toString();
+
         int nameIndex = -1;
-        if (MinecraftClient.getInstance().player != null) {
-            StringBuilder stringBuilder = new StringBuilder();
-            text.accept((unused, style, charInt) -> {
-                stringBuilder.append((char) charInt);
-                return true;
-            });
-            nameIndex = stringBuilder.indexOf(MinecraftClient.getInstance().player.getName().getString());
+        if (MinecraftClient.getInstance().player != null)
+            nameIndex = fullText.indexOf(MinecraftClient.getInstance().player.getName().getString());
+
+        int rankValueStart = -1;
+        int rankPos = fullText.indexOf("Ранг:");
+        if (rankPos != -1) {
+            rankValueStart = rankPos + "Ранг:".length();
+            while (rankValueStart < fullText.length() && fullText.charAt(rankValueStart) == ' ')
+                rankValueStart++;
         }
 
-        IndexHideDrawer drawer = new IndexHideDrawer(self, nameIndex, vertexConsumerProvider, x, y, color, shadow, matrix, layerType, light);
+        IndexHideDrawer drawer = new IndexHideDrawer(self, nameIndex, rankValueStart, vertexConsumerProvider, x, y, color, shadow, matrix, layerType, light);
         text.accept(drawer);
         cir.setReturnValue(drawer.drawLayer(underlineColor, x));
     }
