@@ -81,7 +81,6 @@ public final class OBSOverlay {
         if (initLibrary()) libraryInitialized = true;
         else OBSOverlay.LOGGER.error("Failed to initialize OBS Overlay library");
 
-        OBSOverlayConfig.init();
         AllDefaultOverlayComponents.init();
     }
 }

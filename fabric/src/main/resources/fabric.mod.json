@@ -19,9 +19,7 @@
     "client": [
       "me.zziger.obsoverlay.fabric.client.OBSOverlayFabricClient"
     ],
-    "modmenu": [
-      "me.zziger.obsoverlay.fabric.client.ModMenuIntegration"
-    ]
+    "modmenu": []
   },
   "custom": {
     "modmenu": {
