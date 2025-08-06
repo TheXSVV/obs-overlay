@@ -7,6 +7,7 @@
     "GameRendererMixin",
     "MinecraftClientMixin",
     "ScreenMixin",
+    "TextRendererMixin",
     "TitleScreenMixin",
     "VideoOptionsScreenMixin",
     "hud.ChatHudMixin",
