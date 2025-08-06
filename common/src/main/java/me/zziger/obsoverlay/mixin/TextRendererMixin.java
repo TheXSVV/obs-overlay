@@ -60,7 +60,12 @@ public class TextRendererMixin implements TextRendererInterface {
                 rankValueStart++;
         }
 
-        IndexHideDrawer drawer = new IndexHideDrawer(self, nameIndex, rankValueStart, vertexConsumerProvider, x, y, color, shadow, matrix, layerType, light);
+        int anarchyDigitsStart = -1;
+        int anarchyPos = fullText.indexOf("Анархия-");
+        if (anarchyPos != -1)
+            anarchyDigitsStart = anarchyPos + "Анархия-".length();
+
+        IndexHideDrawer drawer = new IndexHideDrawer(self, nameIndex, rankValueStart, anarchyDigitsStart, vertexConsumerProvider, x, y, color, shadow, matrix, layerType, light);
         text.accept(drawer);
         cir.setReturnValue(drawer.drawLayer(underlineColor, x));
     }

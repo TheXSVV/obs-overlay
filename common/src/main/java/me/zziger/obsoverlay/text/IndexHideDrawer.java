@@ -21,6 +21,7 @@ public class IndexHideDrawer implements CharacterVisitor {
     private final TextRenderer textRenderer;
     private final int hideIndex;
     private final int rankValueStart;
+    private final int anarchyDigitsStart;
 
     final VertexConsumerProvider vertexConsumers;
     private final boolean shadow;
@@ -45,10 +46,11 @@ public class IndexHideDrawer implements CharacterVisitor {
         this.rectangles.add(rectangle);
     }
 
-    public IndexHideDrawer(final TextRenderer textRenderer, final int hideIndex, final int rankValueStart, final VertexConsumerProvider vertexConsumers, final float x, final float y, final int color, final boolean shadow, final Matrix4f matrix, final TextRenderer.TextLayerType layerType, final int light) {
+    public IndexHideDrawer(final TextRenderer textRenderer, final int hideIndex, final int rankValueStart, final int anarchyDigitsStart, final VertexConsumerProvider vertexConsumers, final float x, final float y, final int color, final boolean shadow, final Matrix4f matrix, final TextRenderer.TextLayerType layerType, final int light) {
         this.textRenderer = textRenderer;
         this.hideIndex = hideIndex;
         this.rankValueStart = rankValueStart;
+        this.anarchyDigitsStart = anarchyDigitsStart;
         this.vertexConsumers = vertexConsumers;
         this.x = x;
         this.y = y;
@@ -64,12 +66,15 @@ public class IndexHideDrawer implements CharacterVisitor {
     }
 
     private int index = 0;
+    private int anarchyReplacementIndex = 0;
+    private boolean inAnarchyReplacement = false;
     private int replacementIndex = 0;
     private int rankReplacementIndex = 0;
     private boolean inRankReplacement = false;
 
     private static final String REPLACEMENT_STRING = "Ксолвик";
     private static final String RANK_REPLACEMENT = "Staff";
+    private static final String ANARCHY_REPLACEMENT = "000";
 
     public boolean accept(int i, Style style, int charInt) {
         TextRendererInterface rendererInterface = (TextRendererInterface) textRenderer;
@@ -85,9 +90,7 @@ public class IndexHideDrawer implements CharacterVisitor {
                     index++;
                     return true;
                 }
-            }
-
-            if (rankValueStart != -1 && index >= rankValueStart && !Character.isWhitespace(charInt)) {
+            } else if (rankValueStart != -1 && index >= rankValueStart && !Character.isWhitespace(charInt)) {
                 if (!inRankReplacement) {
                     inRankReplacement = true;
                     rankReplacementIndex = 0;
@@ -96,6 +99,19 @@ public class IndexHideDrawer implements CharacterVisitor {
                 if (rankReplacementIndex < RANK_REPLACEMENT.length()) {
                     charInt = RANK_REPLACEMENT.charAt(rankReplacementIndex);
                     rankReplacementIndex++;
+                } else {
+                    index++;
+                    return true;
+                }
+            } else if (anarchyDigitsStart != -1 && index >= anarchyDigitsStart && index < anarchyDigitsStart + 3 && Character.isDigit(charInt)) {
+                if (!inAnarchyReplacement) {
+                    inAnarchyReplacement = true;
+                    anarchyReplacementIndex = 0;
+                }
+
+                if (anarchyReplacementIndex < ANARCHY_REPLACEMENT.length()) {
+                    charInt = ANARCHY_REPLACEMENT.charAt(anarchyReplacementIndex);
+                    anarchyReplacementIndex++;
                 } else {
                     index++;
                     return true;
